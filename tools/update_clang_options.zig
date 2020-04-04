@@ -344,6 +344,14 @@ const known_options = [_]KnownOpt{
         .name = "include-directory",
         .ident = "include_dir",
     },
+    .{
+        .name = "x",
+        .ident = "treat_as_language",
+    },
+    .{
+        .name = "language",
+        .ident = "treat_as_language",
+    },
 };
 
 const blacklisted_options = [_][]const u8{};

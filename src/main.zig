@@ -612,6 +612,7 @@ fn buildOutputType(
     var subsystem: ?std.Target.SubSystem = null;
     var major_subsystem_version: ?u32 = null;
     var minor_subsystem_version: ?u32 = null;
+    var treat_as_file_ext: Compilation.FileExt = .unknown;
 
     var system_libs = std.ArrayList([]const u8).init(gpa);
     defer system_libs.deinit();
@@ -1125,7 +1126,12 @@ fn buildOutputType(
                         try clang_argv.appendSlice(it.other_args);
                     },
                     .positional => {
-                        const file_ext = Compilation.classifyFileExt(mem.spanZ(it.only_arg));
+                        var file_ext: Compilation.FileExt = undefined;
+                        if (treat_as_file_ext == .unknown) {
+                            file_ext = Compilation.classifyFileExt(mem.spanZ(it.only_arg));
+                        } else {
+                            file_ext = treat_as_file_ext;
+                        }
                         switch (file_ext) {
                             .assembly, .c, .cpp, .ll, .bc, .h => try c_source_files.append(.{ .src_path = it.only_arg }),
                             .unknown, .shared_library, .object, .static_library => {
@@ -1251,6 +1257,17 @@ fn buildOutputType(
                     .nostdlibinc => want_native_include_dirs = false,
                     .strip => strip = true,
                     .include_dir => try clang_argv.appendSlice(it.other_args),
+                    .treat_as_language => {
+                        if (mem.eql(u8, it.only_arg, "c") or mem.eql(u8, it.only_arg, "c-header")) {
+                            treat_as_file_ext = .c;
+                        } else if (mem.eql(u8, it.only_arg, "c++")) {
+                            treat_as_file_ext = .cpp;
+                        } else {
+                            treat_as_file_ext = .unknown;
+                            fatal("unsupported value '{s}' for -x or --language option", .{it.only_arg});
+                        }
+                        try clang_argv.appendSlice(it.other_args);
+                    },
                 }
             }
             // Parse linker args.
@@ -3331,6 +3348,7 @@ pub const ClangArgIterator = struct {
         no_red_zone,
         strip,
         include_dir,
+        treat_as_language,
     };
 
     const Args = struct {
