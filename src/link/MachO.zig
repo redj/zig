@@ -589,6 +589,7 @@ fn linkWithLLD(self: *MachO, comp: *Compilation) !void {
         man.hash.addStringSet(self.base.options.system_libs);
         man.hash.add(allow_shlib_undefined);
         man.hash.add(self.base.options.bind_global_refs_locally);
+        man.hash.add(self.base.options.no_undefined);
         man.hash.add(self.base.options.system_linker_hack);
         man.hash.addOptionalBytes(self.base.options.syslibroot);
 
@@ -1027,6 +1028,9 @@ fn linkWithLLD(self: *MachO, comp: *Compilation) !void {
         }
         if (self.base.options.bind_global_refs_locally) {
             try argv.append("-Bsymbolic");
+        }
+        if (self.base.options.no_undefined) {
+            try argv.append("--no-undefined");
         }
 
         if (self.base.options.verbose_link) {

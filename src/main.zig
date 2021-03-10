@@ -585,6 +585,7 @@ fn buildOutputType(
     var linker_gc_sections: ?bool = null;
     var linker_allow_shlib_undefined: ?bool = null;
     var linker_bind_global_refs_locally: ?bool = null;
+    var linker_no_undefined: ?bool = null;
     var linker_z_nodelete = false;
     var linker_z_defs = false;
     var linker_tsaware = false;
@@ -1348,6 +1349,8 @@ fn buildOutputType(
                     linker_allow_shlib_undefined = false;
                 } else if (mem.eql(u8, arg, "-Bsymbolic")) {
                     linker_bind_global_refs_locally = true;
+                } else if (mem.eql(u8, arg, "--no-undefined")) {
+                    linker_no_undefined = true;
                 } else if (mem.eql(u8, arg, "-z")) {
                     i += 1;
                     if (i >= linker_args.items.len) {
@@ -1936,6 +1939,7 @@ fn buildOutputType(
         .linker_gc_sections = linker_gc_sections,
         .linker_allow_shlib_undefined = linker_allow_shlib_undefined,
         .linker_bind_global_refs_locally = linker_bind_global_refs_locally,
+        .linker_no_undefined = linker_no_undefined,
         .linker_z_nodelete = linker_z_nodelete,
         .linker_z_defs = linker_z_defs,
         .linker_tsaware = linker_tsaware,

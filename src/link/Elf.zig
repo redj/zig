@@ -1354,6 +1354,7 @@ fn linkWithLLD(self: *Elf, comp: *Compilation) !void {
         man.hash.add(allow_shlib_undefined);
         man.hash.add(self.base.options.bind_global_refs_locally);
         man.hash.add(self.base.options.tsan);
+        man.hash.add(self.base.options.no_undefined);
 
         // We don't actually care whether it's a cache hit or miss; we just need the digest and the lock.
         _ = try man.hit();
@@ -1655,6 +1656,10 @@ fn linkWithLLD(self: *Elf, comp: *Compilation) !void {
 
         if (self.base.options.bind_global_refs_locally) {
             try argv.append("-Bsymbolic");
+        }
+
+        if (self.base.options.no_undefined) {
+            try argv.append("--no-undefined");
         }
 
         if (self.base.options.verbose_link) {

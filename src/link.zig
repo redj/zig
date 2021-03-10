@@ -74,6 +74,7 @@ pub const Options = struct {
     nxcompat: bool,
     dynamicbase: bool,
     bind_global_refs_locally: bool,
+    no_undefined: bool,
     is_native_os: bool,
     is_native_abi: bool,
     pic: bool,
